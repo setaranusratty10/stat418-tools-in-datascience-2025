@@ -134,3 +134,38 @@ END {
   print "Max response size: " max " bytes"
   print "Average response size: " int(sum / count) " bytes"
 }' NASA_Aug95.log
+
+#9
+# 1) Generate all August dates
+printf "%02d/Aug/1995\n" {1..31} > all_dates.txt
+
+# 2) Extract only the dates that actually appear in the log
+grep -a -o '[0-9]\{2\}/Aug/1995' NASA_Aug95.log | sort -u > present_dates.txt
+
+# 3) Find the dates that are in all_dates.txt but not in present_dates.txt
+comm -23 all_dates.txt present_dates.txt > missing_dates.txt
+
+# 4) For each missing date, show the entire day (00:00:00–23:59:59)
+while read dt; do
+  echo "$dt 00:00:00 - $dt 23:59:59"
+done < missing_dates.txt
+
+#how long the outage lasted 
+wc -l < missing_dates.txt
+
+#10
+#july
+grep -a -o '[0-9]\{2\}/Jul/1995' NASA_Jul95.log \
+  | sort | uniq -c | sort -nr | head -1
+
+#august
+grep -a -o '[0-9]\{2\}/Aug/1995' NASA_Aug95.log \
+  | sort | uniq -c | sort -nr | head -1
+
+#11
+grep -a -o '[0-9]\{2\}/Aug/1995' NASA_Aug95.log \
+  | grep -v '^02/Aug/1995$' \
+  | sort | uniq -c \
+  | sort -n \
+  | head -1
+
